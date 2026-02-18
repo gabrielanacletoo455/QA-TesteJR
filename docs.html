@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API de Vagas de Emprego — Documentação</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      line-height: 1.7;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 280px;
+      height: 100vh;
+      background: #1e293b;
+      border-right: 1px solid #334155;
+      overflow-y: auto;
+      padding: 24px 0;
+      z-index: 10;
+    }
+
+    .sidebar-logo {
+      padding: 0 24px 24px;
+      border-bottom: 1px solid #334155;
+      margin-bottom: 16px;
+    }
+
+    .sidebar-logo h2 {
+      font-size: 18px;
+      color: #38bdf8;
+    }
+
+    .sidebar-logo span {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .sidebar nav a {
+      display: block;
+      padding: 8px 24px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all .15s;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar nav a:hover,
+    .sidebar nav a.active {
+      color: #e2e8f0;
+      background: #0f172a;
+      border-left-color: #38bdf8;
+    }
+
+    .sidebar nav .section-label {
+      padding: 16px 24px 4px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #475569;
+      font-weight: 700;
+    }
+
+    /* ── Main ── */
+    .main {
+      margin-left: 280px;
+      max-width: 900px;
+      padding: 48px 56px 120px;
+    }
+
+    h1 {
+      font-size: 32px;
+      color: #f1f5f9;
+      margin-bottom: 8px;
+    }
+
+    h1 + p { color: #94a3b8; margin-bottom: 40px; font-size: 17px; }
+
+    h2 {
+      font-size: 22px;
+      color: #f1f5f9;
+      margin: 48px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    h3 {
+      font-size: 17px;
+      color: #cbd5e1;
+      margin: 32px 0 12px;
+    }
+
+    p { margin-bottom: 12px; color: #cbd5e1; }
+
+    /* ── Method badges ── */
+    .endpoint {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 14px 20px;
+      margin: 16px 0;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 15px;
+    }
+
+    .method {
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: .5px;
+      flex-shrink: 0;
+    }
+
+    .method.get    { background: #166534; color: #86efac; }
+    .method.post   { background: #1e40af; color: #93c5fd; }
+    .method.put    { background: #92400e; color: #fcd34d; }
+    .method.patch  { background: #7c2d12; color: #fdba74; }
+    .method.delete { background: #991b1b; color: #fca5a5; }
+
+    .endpoint .path { color: #e2e8f0; }
+
+    /* ── Code blocks ── */
+    pre {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 20px;
+      overflow-x: auto;
+      margin: 12px 0 20px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 13px;
+    }
+
+    pre code { color: #e2e8f0; }
+
+    p code, li code, td code {
+      background: #334155;
+      color: #38bdf8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    /* JSON syntax highlighting */
+    .json-key   { color: #7dd3fc; }
+    .json-str   { color: #86efac; }
+    .json-num   { color: #fcd34d; }
+    .json-bool  { color: #c084fc; }
+    .json-null  { color: #94a3b8; }
+    .json-comm  { color: #475569; }
+
+    /* ── Tables ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 14px;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 10px 14px;
+      background: #1e293b;
+      color: #94a3b8;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      border-bottom: 2px solid #334155;
+    }
+
+    tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e293b;
+      color: #cbd5e1;
+    }
+
+    tbody tr:hover { background: #1e293b55; }
+
+    /* ── Alert / info boxes ── */
+    .info-box {
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .info-box.tip    { background: #0c4a6e22; border: 1px solid #0c4a6e; }
+    .info-box.warn   { background: #78350f22; border: 1px solid #78350f; }
+    .info-box.important { background: #14532d22; border: 1px solid #14532d; }
+
+    .info-box .icon { font-size: 18px; flex-shrink: 0; }
+
+    /* ── Ordered lists ── */
+    ol, ul {
+      padding-left: 24px;
+      margin: 12px 0;
+    }
+
+    li {
+      margin-bottom: 6px;
+      color: #cbd5e1;
+    }
+
+    li strong { color: #e2e8f0; }
+
+    /* ── Quickstart terminal ── */
+    .terminal {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 16px 0 24px;
+    }
+
+    .terminal-header {
+      background: #1e293b;
+      padding: 8px 16px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .terminal-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot.r { background: #ef4444; }
+    .terminal-dot.y { background: #eab308; }
+    .terminal-dot.g { background: #22c55e; }
+
+    .terminal pre {
+      margin: 0;
+      border: none;
+      border-radius: 0;
+      padding: 20px;
+      background: transparent;
+    }
+
+    .terminal .prompt { color: #22c55e; }
+    .terminal .comment { color: #64748b; }
+
+    /* ── Divider ── */
+    hr {
+      border: none;
+      border-top: 1px solid #1e293b;
+      margin: 40px 0;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 24px 20px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h2>📋 Job Search API</h2>
+      <span>v1.0.0 — Documentação</span>
+    </div>
+    <nav>
+      <div class="section-label">Início</div>
+      <a href="#quickstart">Quickstart</a>
+      <a href="#base-url">Base URL</a>
+
+      <div class="section-label">Endpoints</div>
+      <a href="#list-jobs">GET — Listar Vagas</a>
+      <a href="#get-job">GET — Buscar por ID</a>
+      <a href="#create-job">POST — Criar Vaga</a>
+      <a href="#update-job">PUT — Atualizar (Completa)</a>
+      <a href="#patch-job">PATCH — Atualizar (Parcial)</a>
+      <a href="#delete-job">DELETE — Remover Vaga</a>
+      <a href="#stats">GET — Estatísticas</a>
+
+      <div class="section-label">Referência</div>
+      <a href="#data-model">Modelo de Dados</a>
+      <a href="#testing-tips">Dicas para Testes</a>
+    </nav>
+  </aside>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <div class="main">
+
+    <h1>API de Vagas de Emprego</h1>
+    <p>API REST completa para gerenciamento e busca de vagas de emprego. CRUD com paginação, ordenação, filtros e estatísticas.</p>
+
+    <!-- ── Quickstart ── -->
+    <h2 id="quickstart">🚀 Quickstart</h2>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <span class="terminal-dot r"></span>
+        <span class="terminal-dot y"></span>
+        <span class="terminal-dot g"></span>
+      </div>
+      <pre><code><span class="prompt">$</span> npm install
+<span class="prompt">$</span> npm run seed    <span class="comment"># Popular banco com dados de exemplo</span>
+<span class="prompt">$</span> npm start       <span class="comment"># Iniciar servidor na porta 3000</span></code></pre>
+    </div>
+
+    <h2 id="base-url">📡 Base URL</h2>
+    <div class="endpoint">
+      <span class="path">http://localhost:3000</span>
+    </div>
+
+    <hr>
+
+    <!-- ══════════════════════════════════════ -->
+    <!--  1. LISTAR VAGAS                      -->
+    <!-- ══════════════════════════════════════ -->
+    <h2 id="list-jobs">1. Listar Vagas</h2>
+
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="path">/api/jobs</span>
+    </div>
+
+    <h3>Query Parameters</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Parâmetro</th>
+          <th>Tipo</th>
+          <th>Padrão</th>
+          <th>Descrição</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>page</code></td>
+          <td>number</td>
+          <td>1</td>
+          <td>Número da página</td>
+        </tr>
+        <tr>
+          <td><code>limit</code></td>
+          <td>number</td>
+          <td>10</td>
+          <td>Itens por página</td>
+        </tr>
+        <tr>
+          <td><code>sort</code></td>
+          <td>string</td>
+          <td><code>created_at</code></td>
+          <td>Campo de ordenação: <code>created_at</code>, <code>title</code>, <code>salary_min</code>, <code>salary_max</code>, <code>company</code>, <code>updated_at</code></td>
+        </tr>
+        <tr>
+          <td><code>order</code></td>
+          <td>string</td>
+          <td><code>desc</code></td>
+          <td>Direção da ordenação: <code>asc</code> ou <code>desc</code></td>
+        </tr>
+        <tr>
+          <td><code>search</code></td>
+          <td>string</td>
+          <td>—</td>
+          <td>Busca por texto em <code>title</code>, <code>description</code> e <code>requirements</code></td>
+        </tr>
+        <tr>
+          <td><code>location</code></td>
+          <td>string</td>
+          <td>—</td>
+          <td>Filtrar por localização (busca parcial)</td>
+        </tr>
+        <tr>
+          <td><code>type</code></td>
+          <td>string</td>
+          <td>—</td>
+          <td>Filtrar por tipo: <code>CLT</code>, <code>PJ</code>, <code>Estágio</code>, <code>Freelancer</code></td>
+        </tr>
+        <tr>
+          <td><code>level</code></td>
+          <td>string</td>
+          <td>—</td>
+          <td>Filtrar por nível: <code>estagio</code>, <code>junior</code>, <code>pleno</code>, <code>senior</code></td>
+        </tr>
+        <tr>
+          <td><code>status</code></td>
+          <td>string</td>
+          <td>—</td>
+          <td>Filtrar por status: <code>active</code>, <code>inactive</code></td>
+        </tr>
+        <tr>
+          <td><code>salary_min</code></td>
+          <td>number</td>
+          <td>—</td>
+          <td>Salário mínimo — retorna vagas com salário <strong>&gt;=</strong> este valor</td>
+        </tr>
+        <tr>
+          <td><code>salary_max</code></td>
+          <td>number</td>
+          <td>—</td>
+          <td>Salário máximo — retorna vagas com salário <strong>&lt;=</strong> este valor</td>
+        </tr>
+        <tr>
+          <td><code>company</code></td>
+          <td>string</td>
+          <td>—</td>
+          <td>Filtrar por empresa (busca parcial)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Exemplo de Requisição</h3>
+    <pre><code><span class="method get" style="font-size:11px;padding:2px 6px;">GET</span> /api/jobs?page=1&amp;limit=5&amp;sort=salary_min&amp;order=asc&amp;level=pleno&amp;status=active</code></pre>
+
+    <h3>Resposta — <code>200 OK</code></h3>
+    <pre><code>{
+  <span class="json-key">"data"</span>: [...],
+  <span class="json-key">"pagination"</span>: {
+    <span class="json-key">"current_page"</span>: <span class="json-num">1</span>,
+    <span class="json-key">"per_page"</span>: <span class="json-num">5</span>,
+    <span class="json-key">"total"</span>: <span class="json-num">12</span>,
+    <span class="json-key">"total_pages"</span>: <span class="json-num">3</span>,
+    <span class="json-key">"has_next"</span>: <span class="json-bool">true</span>,
+    <span class="json-key">"has_prev"</span>: <span class="json-bool">false</span>
+  }
+}</code></pre>
+
+    <hr>
+
+    <!-- ══════════════════════════════════════ -->
+    <!--  2. BUSCAR POR ID                     -->
+    <!-- ══════════════════════════════════════ -->
+    <h2 id="get-job">2. Buscar Vaga por ID</h2>
+
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="path">/api/jobs/:id</span>
+    </div>
+
+    <h3>Resposta de sucesso — <code>200 OK</code></h3>
+    <pre><code>{
+  <span class="json-key">"data"</span>: {
+    <span class="json-key">"id"</span>: <span class="json-num">1</span>,
+    <span class="json-key">"title"</span>: <span class="json-str">"Desenvolvedor Frontend React"</span>,
+    <span class="json-key">"company"</span>: <span class="json-str">"TechBrasil"</span>,
+    <span class="json-key">"location"</span>: <span class="json-str">"São Paulo - SP"</span>,
+    <span class="json-comm">// ... demais campos</span>
+  }
+}</code></pre>
+
+    <h3>Resposta de erro — <code>404 Not Found</code></h3>
+    <pre><code>{
+  <span class="json-key">"error"</span>: <span class="json-str">"Vaga não encontrada"</span>
+}</code></pre>
+
+    <div class="info-box tip">
+      <span class="icon">💡</span>
+      <span>Quando a vaga não existe, a API deve retornar <code>404</code> com uma mensagem de erro — nunca um body vazio.</span>
+    </div>
+
+    <hr>
+
+    <!-- ══════════════════════════════════════ -->
+    <!--  3. CRIAR VAGA                        -->
+    <!-- ══════════════════════════════════════ -->
+    <h2 id="create-job">3. Criar Nova Vaga</h2>
+
+    <div class="endpoint">
+      <span class="method post">POST</span>
+      <span class="path">/api/jobs</span>
+    </div>
+
+    <h3>Body (JSON)</h3>
+    <pre><code>{
+  <span class="json-key">"title"</span>: <span class="json-str">"Desenvolvedor Full Stack"</span>,
+  <span class="json-key">"company"</span>: <span class="json-str">"MinhaEmpresa"</span>,
+  <span class="json-key">"location"</span>: <span class="json-str">"Remoto"</span>,
+  <span class="json-key">"salary_min"</span>: <span class="json-num">5000</span>,
+  <span class="json-key">"salary_max"</span>: <span class="json-num">9000</span>,
+  <span class="json-key">"type"</span>: <span class="json-str">"CLT"</span>,
+  <span class="json-key">"level"</span>: <span class="json-str">"pleno"</span>,
+  <span class="json-key">"description"</span>: <span class="json-str">"Desenvolvimento web full stack com React e Node.js"</span>,
+  <span class="json-key">"requirements"</span>: <span class="json-str">"React, Node.js, TypeScript, PostgreSQL"</span>,
+  <span class="json-key">"status"</span>: <span class="json-str">"active"</span>
+}</code></pre>
+
+    <div class="info-box important">
+      <span class="icon">✅</span>
+      <div>
+        <strong>Campos obrigatórios:</strong> <code>title</code>, <code>company</code>, <code>location</code><br>
+        <strong>Valores válidos para <code>type</code>:</strong> <code>CLT</code>, <code>PJ</code>, <code>Estágio</code>, <code>Freelancer</code><br>
+        <strong>Valores válidos para <code>level</code>:</strong> <code>estagio</code>, <code>junior</code>, <code>pleno</code>, <code>senior</code>
+      </div>
+    </div>
+
+    <div class="info-box warn">
+      <span class="icon">⚠️</span>
+      <span>O campo <code>salary_max</code> deve ser sempre <strong>maior ou igual</strong> ao <code>salary_min</code>. A API deve rejeitar valores inconsistentes.</span>
+    </div>
+
+    <h3>Resposta de sucesso — <code>201 Created</code></h3>
+    <pre><code>{
+  <span class="json-key">"message"</span>: <span class="json-str">"Vaga criada com sucesso"</span>,
+  <span class="json-key">"data"</span>: { <span class="json-comm">/* objeto da vaga criada */</span> }
+}</code></pre>
+
+    <h3>Resposta de erro — <code>400 Bad Request</code></h3>
+    <pre><code>{
+  <span class="json-key">"error"</span>: <span class="json-str">"Campos obrigatórios faltando"</span>,
+  <span class="json-key">"required"</span>: [<span class="json-str">"title"</span>, <span class="json-str">"company"</span>, <span class="json-str">"location"</span>]
+}</code></pre>
+
+    <hr>
+
+    <!-- ══════════════════════════════════════ -->
+    <!--  4. ATUALIZAR (PUT)                   -->
+    <!-- ══════════════════════════════════════ -->
+    <h2 id="update-job">4. Atualizar Vaga (Completa)</h2>
+
+    <div class="endpoint">
+      <span class="method put">PUT</span>
+      <span class="path">/api/jobs/:id</span>
+    </div>
+
+    <p>Todos os campos obrigatórios devem ser enviados no body.</p>
+
+    <div class="info-box important">
+      <span class="icon">✅</span>
+      <span><strong>Campos obrigatórios:</strong> <code>title</code>, <code>company</code>, <code>location</code></span>
+    </div>
+
+    <h3>Resposta de sucesso — <code>200 OK</code></h3>
+    <pre><code>{
+  <span class="json-key">"message"</span>: <span class="json-str">"Vaga atualizada com sucesso"</span>,
+  <span class="json-key">"data"</span>: { <span class="json-comm">/* objeto da vaga atualizada */</span> }
+}</code></pre>
+
+    <div class="info-box tip">
+      <span class="icon">💡</span>
+      <span>O campo <code>updated_at</code> deve ser atualizado automaticamente para a data/hora atual ao realizar o PUT.</span>
+    </div>
+
+    <hr>
+
+    <!-- ══════════════════════════════════════ -->
+    <!--  5. ATUALIZAR (PATCH)                 -->
+    <!-- ══════════════════════════════════════ -->
+    <h2 id="patch-job">5. Atualizar Vaga (Parcial)</h2>
+
+    <div class="endpoint">
+      <span class="method patch">PATCH</span>
+      <span class="path">/api/jobs/:id</span>
+    </div>
+
+    <p>Envie apenas os campos que deseja atualizar.</p>
+
+    <h3>Exemplo de Body</h3>
+    <pre><code>{
+  <span class="json-key">"salary_max"</span>: <span class="json-num">10000</span>,
+  <span class="json-key">"status"</span>: <span class="json-str">"inactive"</span>
+}</code></pre>
+
+    <div class="info-box warn">
+      <span class="icon">⚠️</span>
+      <span>Os campos <code>id</code> e <code>created_at</code> <strong>NÃO podem</strong> ser alterados via PATCH.</span>
+    </div>
+
+    <div class="info-box tip">
+      <span class="icon">💡</span>
+      <span>O campo <code>updated_at</code> deve ser atualizado automaticamente para a data/hora atual ao realizar o PATCH.</span>
+    </div>
+
+    <hr>
+
+    <!-- ══════════════════════════════════════ -->
+    <!--  6. DELETE                             -->
+    <!-- ══════════════════════════════════════ -->
+    <h2 id="delete-job">6. Remover Vaga</h2>
+
+    <div class="endpoint">
+      <span class="method delete">DELETE</span>
+      <span class="path">/api/jobs/:id</span>
+    </div>
+
+    <h3>Resposta de sucesso — <code>200 OK</code></h3>
+    <pre><code>{
+  <span class="json-key">"message"</span>: <span class="json-str">"Vaga removida com sucesso"</span>,
+  <span class="json-key">"data"</span>: { <span class="json-comm">/* objeto da vaga que foi removida */</span> }
+}</code></pre>
+
+    <div class="info-box warn">
+      <span class="icon">⚠️</span>
+      <div>
+        A vaga deve ser <strong>permanentemente removida</strong> do banco de dados.<br>
+        Um <code>GET /api/jobs/:id</code> subsequente deve retornar <code>404</code>.
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ══════════════════════════════════════ -->
+    <!--  7. STATS                             -->
+    <!-- ══════════════════════════════════════ -->
+    <h2 id="stats">7. Estatísticas</h2>
+
+    <div class="endpoint">
+      <span class="method get">GET</span>
+      <span class="path">/api/jobs/stats/summary</span>
+    </div>
+
+    <h3>Resposta — <code>200 OK</code></h3>
+    <pre><code>{
+  <span class="json-key">"data"</span>: {
+    <span class="json-key">"total"</span>: <span class="json-num">20</span>,
+    <span class="json-key">"active"</span>: <span class="json-num">18</span>,
+    <span class="json-key">"inactive"</span>: <span class="json-num">2</span>,
+    <span class="json-key">"average_salary"</span>: {
+      <span class="json-key">"min"</span>: <span class="json-num">6750</span>,
+      <span class="json-key">"max"</span>: <span class="json-num">10975</span>
+    },
+    <span class="json-key">"by_type"</span>: [...],
+    <span class="json-key">"by_level"</span>: [...],
+    <span class="json-key">"by_location"</span>: [...]
+  }
+}</code></pre>
+
+    <div class="info-box tip">
+      <span class="icon">💡</span>
+      <span>O campo <code>total</code> deve ser exatamente a soma de <code>active</code> + <code>inactive</code>.</span>
+    </div>
+
+    <hr>
+
+    <!-- ══════════════════════════════════════ -->
+    <!--  MODELO DE DADOS                      -->
+    <!-- ══════════════════════════════════════ -->
+    <h2 id="data-model">📦 Modelo de Dados</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Campo</th>
+          <th>Tipo</th>
+          <th>Obrigatório</th>
+          <th>Descrição</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>id</code></td>
+          <td>integer</td>
+          <td>auto</td>
+          <td>ID único (auto incremento)</td>
+        </tr>
+        <tr>
+          <td><code>title</code></td>
+          <td>string</td>
+          <td>✅ sim</td>
+          <td>Título da vaga</td>
+        </tr>
+        <tr>
+          <td><code>company</code></td>
+          <td>string</td>
+          <td>✅ sim</td>
+          <td>Nome da empresa</td>
+        </tr>
+        <tr>
+          <td><code>location</code></td>
+          <td>string</td>
+          <td>✅ sim</td>
+          <td>Localização da vaga</td>
+        </tr>
+        <tr>
+          <td><code>salary_min</code></td>
+          <td>number</td>
+          <td>❌ não</td>
+          <td>Salário mínimo</td>
+        </tr>
+        <tr>
+          <td><code>salary_max</code></td>
+          <td>number</td>
+          <td>❌ não</td>
+          <td>Salário máximo (deve ser &gt;= salary_min)</td>
+        </tr>
+        <tr>
+          <td><code>type</code></td>
+          <td>string</td>
+          <td>❌ não</td>
+          <td>Tipo: <code>CLT</code>, <code>PJ</code>, <code>Estágio</code>, <code>Freelancer</code> &nbsp;(padrão: CLT)</td>
+        </tr>
+        <tr>
+          <td><code>level</code></td>
+          <td>string</td>
+          <td>❌ não</td>
+          <td>Nível: <code>estagio</code>, <code>junior</code>, <code>pleno</code>, <code>senior</code> &nbsp;(padrão: junior)</td>
+        </tr>
+        <tr>
+          <td><code>description</code></td>
+          <td>string</td>
+          <td>❌ não</td>
+          <td>Descrição completa da vaga</td>
+        </tr>
+        <tr>
+          <td><code>requirements</code></td>
+          <td>string</td>
+          <td>❌ não</td>
+          <td>Requisitos da vaga</td>
+        </tr>
+        <tr>
+          <td><code>status</code></td>
+          <td>string</td>
+          <td>❌ não</td>
+          <td>Status: <code>active</code>, <code>inactive</code> &nbsp;(padrão: active)</td>
+        </tr>
+        <tr>
+          <td><code>created_at</code></td>
+          <td>string</td>
+          <td>auto</td>
+          <td>Data de criação (gerado automaticamente)</td>
+        </tr>
+        <tr>
+          <td><code>updated_at</code></td>
+          <td>string</td>
+          <td>auto</td>
+          <td>Data da última atualização (atualizado automaticamente)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <!-- ══════════════════════════════════════ -->
+    <!--  DICAS PARA TESTES                    -->
+    <!-- ══════════════════════════════════════ -->
+    <h2 id="testing-tips">🧪 Dicas para Testes no Postman</h2>
+
+    <div class="info-box important" style="margin-bottom:24px;">
+      <span class="icon">🎯</span>
+      <div>
+        <strong>Objetivo:</strong> Esta API possui <strong>bugs intencionais</strong>. Seu trabalho como QA é encontrar todas as diferenças
+        entre o comportamento <strong>documentado aqui</strong> e o comportamento <strong>real</strong> da API.<br><br>
+        Para cada bug, documente: <strong>endpoint</strong>, <strong>passos para reproduzir</strong>, <strong>resultado esperado</strong> e <strong>resultado obtido</strong>.
+      </div>
+    </div>
+
+    <h3>📌 Checklist de Testes</h3>
+    <p>Use esta lista como guia. Para cada item, compare o que a documentação diz com o que a API realmente faz:</p>
+
+    <ol>
+      <li><strong>Teste a ordenação com cuidado</strong> — faça uma requisição com <code>order=asc</code> e <code>sort=salary_min</code>. Os salários estão realmente vindo do menor para o maior? Confira os números!</li>
+      <li><strong>Teste o search em diferentes campos</strong> — a documentação diz que <code>search</code> busca em title, description e requirements. Tente buscar uma palavra que você sabe que existe nos requisitos de uma vaga (ex: <code>?search=Docker</code>). Retornou resultados?</li>
+      <li><strong>Teste o filtro de salário</strong> — filtre por <code>salary_min=8000</code>. Os resultados mostram vagas com salário &gt;= 8000? Ou algo diferente?</li>
+      <li><strong>Teste o que acontece com IDs que não existem</strong> — faça <code>GET /api/jobs/99999</code>. Qual status code retornou? O que a documentação diz que deveria retornar?</li>
+      <li><strong>Tente criar uma vaga sem todos os campos obrigatórios</strong> — a documentação diz que title, company e location são obrigatórios. O que acontece se você enviar um POST sem o campo <code>company</code>? E sem <code>title</code>?</li>
+      <li><strong>Teste criar uma vaga com salário invertido</strong> — o que acontece se <code>salary_min</code> for 10000 e <code>salary_max</code> for 5000? A API deveria aceitar isso?</li>
+      <li><strong>Teste valores inválidos nos campos type e level</strong> — a documentação diz que type deve ser CLT, PJ, Estágio ou Freelancer. O que acontece se você enviar <code>"type": "INVALIDO"</code>? E <code>"level": "mestre-jedi"</code>?</li>
+      <li><strong>Teste textos longos</strong> — crie uma vaga com uma <code>description</code> bem longa (200+ caracteres). Depois faça GET nessa vaga. O texto está completo ou foi cortado?</li>
+      <li><strong>Preste atenção no status code do POST</strong> — quando você cria uma vaga com sucesso, qual código HTTP o Postman mostra? Confira na documentação qual deveria ser o código correto para criação de recursos.</li>
+      <li><strong>Teste se updated_at funciona</strong> — anote o <code>updated_at</code> de uma vaga, espere alguns segundos, e faça um PUT ou PATCH. O campo <code>updated_at</code> mudou?</li>
+      <li><strong>Confira todos os campos do DELETE</strong> — delete uma vaga e olhe com atenção os nomes dos campos no JSON de resposta. Todos os campos estão escritos corretamente?</li>
+      <li><strong>Confira as estatísticas</strong> — acesse <code>GET /api/jobs/stats/summary</code>. Pegue os valores de <code>active</code> e <code>inactive</code> e some. O campo <code>total</code> bate com essa soma?</li>
+    </ol>
+
+  </div>
+
+</body>
+</html>

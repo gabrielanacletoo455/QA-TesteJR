@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔐 Gabarito de Bugs — QA Tester</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      line-height: 1.7;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 300px;
+      height: 100vh;
+      background: #1e293b;
+      border-right: 1px solid #334155;
+      overflow-y: auto;
+      padding: 24px 0;
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid #334155;
+      margin-bottom: 12px;
+    }
+
+    .sidebar-header h2 { font-size: 17px; color: #f87171; }
+    .sidebar-header p  { font-size: 12px; color: #64748b; margin-top: 4px; }
+
+    .sidebar .score-box {
+      margin: 12px 20px 16px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 14px 16px;
+      text-align: center;
+    }
+
+    .score-box .number { font-size: 36px; font-weight: 800; color: #f87171; }
+    .score-box .label  { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+
+    .sidebar nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 20px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 13px;
+      transition: all .15s;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar nav a:hover {
+      color: #e2e8f0;
+      background: #0f172a;
+      border-left-color: #f87171;
+    }
+
+    .sidebar nav .section-label {
+      padding: 14px 20px 4px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #475569;
+      font-weight: 700;
+    }
+
+    .sidebar nav .bug-num {
+      background: #991b1b;
+      color: #fca5a5;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .main {
+      margin-left: 300px;
+      max-width: 920px;
+      padding: 48px 56px 120px;
+    }
+
+    h1 { font-size: 30px; color: #f1f5f9; margin-bottom: 4px; }
+    h1 + .subtitle { color: #f87171; margin-bottom: 32px; font-size: 15px; font-weight: 600; }
+
+    .bug-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      margin-bottom: 28px;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+
+    .bug-card:hover { border-color: #475569; }
+
+    .bug-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 24px;
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+    }
+
+    .bug-number {
+      background: #991b1b;
+      color: #fca5a5;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .bug-title { font-size: 16px; font-weight: 700; color: #f1f5f9; }
+
+    .severity {
+      margin-left: auto;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      flex-shrink: 0;
+    }
+
+    .severity.critical { background: #7f1d1d; color: #fca5a5; }
+    .severity.major    { background: #78350f; color: #fcd34d; }
+    .severity.minor    { background: #1e3a5f; color: #93c5fd; }
+    .severity.cosmetic { background: #3f3f46; color: #a1a1aa; }
+
+    .bug-body { padding: 24px; }
+    .bug-body .field { margin-bottom: 18px; }
+    .bug-body .field:last-child { margin-bottom: 0; }
+
+    .field-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .field-value { color: #cbd5e1; font-size: 14px; }
+
+    .endpoint-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 13px;
+    }
+
+    .method-sm {
+      padding: 2px 7px;
+      border-radius: 3px;
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: .5px;
+    }
+
+    .method-sm.get    { background: #166534; color: #86efac; }
+    .method-sm.post   { background: #1e40af; color: #93c5fd; }
+    .method-sm.put    { background: #92400e; color: #fcd34d; }
+    .method-sm.patch  { background: #7c2d12; color: #fdba74; }
+    .method-sm.delete { background: #991b1b; color: #fca5a5; }
+
+    .steps {
+      list-style: none;
+      padding: 0;
+      counter-reset: step;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      margin-bottom: 10px;
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0; top: 1px;
+      width: 22px; height: 22px;
+      background: #334155;
+      color: #94a3b8;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .comparison .box {
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 13px;
+    }
+
+    .comparison .expected { background: #14532d22; border: 1px solid #14532d; }
+    .comparison .expected .box-label { color: #86efac; }
+    .comparison .actual   { background: #7f1d1d22; border: 1px solid #7f1d1d; }
+    .comparison .actual .box-label   { color: #fca5a5; }
+
+    .box-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .box-content {
+      color: #e2e8f0;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 13px;
+    }
+
+    p code, li code, .field-value code {
+      background: #334155;
+      color: #38bdf8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    .summary-table thead th {
+      text-align: left;
+      padding: 10px 14px;
+      background: #1e293b;
+      color: #94a3b8;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      border-bottom: 2px solid #334155;
+    }
+
+    .summary-table tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e293b;
+      color: #cbd5e1;
+    }
+
+    .summary-table tbody tr:hover { background: #1e293b55; }
+
+    .summary-table .count {
+      background: #991b1b;
+      color: #fca5a5;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .dica-checklist {
+      font-size: 13px;
+      color: #94a3b8;
+      font-style: italic;
+      margin-top: 4px;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #1e293b;
+      margin: 48px 0;
+    }
+
+    @media (max-width: 960px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 24px 20px 80px; }
+      .comparison { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>🔐 Gabarito de Bugs</h2>
+      <p>NÃO MOSTRAR PARA A QA!</p>
+    </div>
+
+    <div class="score-box">
+      <div class="number">14</div>
+      <div class="label">Bugs no Total</div>
+    </div>
+
+    <nav>
+      <div class="section-label">Ordenação / Filtros</div>
+      <a href="#bug-1"><span class="bug-num">#1</span> asc/desc invertidos</a>
+      <a href="#bug-2"><span class="bug-num">#2</span> Search só no título</a>
+      <a href="#bug-3"><span class="bug-num">#3</span> salary_min invertido</a>
+
+      <div class="section-label">GET por ID</div>
+      <a href="#bug-4"><span class="bug-num">#4</span> 200 ao invés de 404</a>
+
+      <div class="section-label">POST (Criação)</div>
+      <a href="#bug-5"><span class="bug-num">#5</span> company não validado</a>
+      <a href="#bug-6"><span class="bug-num">#6</span> salary_min &gt; salary_max</a>
+      <a href="#bug-7"><span class="bug-num">#7</span> type aceita qualquer valor</a>
+      <a href="#bug-8"><span class="bug-num">#8</span> level aceita qualquer valor</a>
+      <a href="#bug-9"><span class="bug-num">#9</span> description truncada</a>
+      <a href="#bug-10"><span class="bug-num">#10</span> Status 200 ao invés de 201</a>
+
+      <div class="section-label">PUT / PATCH</div>
+      <a href="#bug-11"><span class="bug-num">#11</span> PUT não atualiza updated_at</a>
+      <a href="#bug-12"><span class="bug-num">#12</span> PATCH não atualiza updated_at</a>
+
+      <div class="section-label">DELETE</div>
+      <a href="#bug-13"><span class="bug-num">#13</span> Typo "statsu"</a>
+
+      <div class="section-label">Estatísticas</div>
+      <a href="#bug-14"><span class="bug-num">#14</span> Total soma errado</a>
+
+      <div class="section-label">Resumo</div>
+      <a href="#summary">📊 Tabela Resumo</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <h1>🔐 Gabarito de Bugs</h1>
+    <p class="subtitle">NÃO MOSTRAR PARA A QA — Este documento contém todas as respostas!</p>
+
+    <!-- ═══ BUG #1 ═══ -->
+    <div class="bug-card" id="bug-1">
+      <div class="bug-header">
+        <span class="bug-number">#1</span>
+        <span class="bug-title">Ordenação invertida (asc/desc trocados)</span>
+        <span class="severity major">Major</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm get">GET</span>
+            <span>/api/jobs?sort=salary_min&amp;order=asc</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">Quando o parâmetro <code>order=asc</code> é enviado, a API retorna em ordem <strong>decrescente</strong>, e quando <code>order=desc</code>, retorna em ordem <strong>crescente</strong>. Os valores estão invertidos no código.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>GET /api/jobs?sort=salary_min&amp;order=asc</code></li>
+            <li>Observar os valores de <code>salary_min</code> nos resultados</li>
+            <li>Os maiores salários aparecem primeiro (ordem decrescente)</li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">order=asc → salários do menor para o maior
+1500, 3000, 3500, 4000, 4500 ...</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">order=asc → salários do maior para o menor
+18000, 15000, 12000, 9000 ...</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 1</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUG #2 ═══ -->
+    <div class="bug-card" id="bug-2">
+      <div class="bug-header">
+        <span class="bug-number">#2</span>
+        <span class="bug-title">Busca por texto só funciona no título</span>
+        <span class="severity major">Major</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm get">GET</span>
+            <span>/api/jobs?search=Docker</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">A documentação diz que o <code>search</code> busca em <code>title</code>, <code>description</code> e <code>requirements</code>, mas na prática só busca no <code>title</code>. Termos que existem nos requisitos ou descrição não são encontrados.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>GET /api/jobs?search=Docker</code></li>
+            <li>Observar que retorna 0 resultados</li>
+            <li>Porém existem várias vagas com "Docker" nos requirements (ex: DevOps, Backend Node.js)</li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">Retorna vagas que mencionam "Docker" no title, description ou requirements (ex: DevOps Engineer, Backend Node.js)</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">Retorna array vazio — busca apenas no campo title onde "Docker" não aparece</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 2</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUG #3 ═══ -->
+    <div class="bug-card" id="bug-3">
+      <div class="bug-header">
+        <span class="bug-number">#3</span>
+        <span class="bug-title">Filtro salary_min funciona ao contrário</span>
+        <span class="severity major">Major</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm get">GET</span>
+            <span>/api/jobs?salary_min=8000</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">O filtro <code>salary_min</code> usa o operador <code>&lt;=</code> ao invés de <code>&gt;=</code>. Quando se pede vagas com salário mínimo &gt;= 8000, retorna vagas com salário &lt;= 8000.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>GET /api/jobs?salary_min=8000</code></li>
+            <li>Observar os valores de <code>salary_min</code> nos resultados</li>
+            <li>Aparecem vagas com salário mínimo de 1500, 3000, 3500... ao invés de 8000+</li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">Retorna vagas com salary_min >= 8000
+(8000, 9000, 12000, 15000, 18000)</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">Retorna vagas com salary_min <= 8000
+(1500, 3000, 3500, 4000, 4500 ...)</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 3</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUG #4 ═══ -->
+    <div class="bug-card" id="bug-4">
+      <div class="bug-header">
+        <span class="bug-number">#4</span>
+        <span class="bug-title">GET por ID inexistente retorna 200 ao invés de 404</span>
+        <span class="severity major">Major</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm get">GET</span>
+            <span>/api/jobs/99999</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">Quando busca uma vaga com ID que não existe, a API retorna status <code>200</code> com body <code>{}</code> vazio, ao invés de retornar status <code>404</code> com mensagem de erro.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>GET /api/jobs/99999</code></li>
+            <li>Verificar o status code — é 200</li>
+            <li>Verificar o body — é um objeto vazio <code>{}</code></li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">Status: 404 Not Found
+Body: {"error": "Vaga não encontrada"}</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">Status: 200 OK
+Body: {}</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 4</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUG #5 ═══ -->
+    <div class="bug-card" id="bug-5">
+      <div class="bug-header">
+        <span class="bug-number">#5</span>
+        <span class="bug-title">POST não valida campo obrigatório "company"</span>
+        <span class="severity major">Major</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm post">POST</span>
+            <span>/api/jobs</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">A documentação diz que <code>title</code>, <code>company</code> e <code>location</code> são obrigatórios, mas é possível criar uma vaga sem o campo <code>company</code>. A validação só checa <code>title</code> e <code>location</code>.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>POST /api/jobs</code> com body: <code>{"title": "Teste", "location": "SP"}</code></li>
+            <li>A vaga é criada com sucesso e <code>company: null</code></li>
+            <li>Deveria retornar 400 com erro de campo obrigatório</li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">Status: 400 Bad Request
+{"error": "Campos obrigatórios faltando"}</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">Status: 200 OK
+Vaga criada com company: null</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUG #6 ═══ -->
+    <div class="bug-card" id="bug-6">
+      <div class="bug-header">
+        <span class="bug-number">#6</span>
+        <span class="bug-title">POST aceita salary_min maior que salary_max</span>
+        <span class="severity minor">Minor</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm post">POST</span>
+            <span>/api/jobs</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">A API não valida se <code>salary_min</code> é menor ou igual a <code>salary_max</code>. É possível criar uma vaga com salário mínimo de R$10.000 e máximo de R$5.000.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>POST /api/jobs</code> com body incluindo <code>"salary_min": 10000, "salary_max": 5000</code></li>
+            <li>A vaga é criada normalmente sem nenhum erro</li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">Status: 400 Bad Request
+Erro indicando que salary_max deve ser >= salary_min</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">Status: 200 OK
+Vaga criada com salary_min: 10000, salary_max: 5000</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 6</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUG #7 ═══ -->
+    <div class="bug-card" id="bug-7">
+      <div class="bug-header">
+        <span class="bug-number">#7</span>
+        <span class="bug-title">POST aceita qualquer valor para "type"</span>
+        <span class="severity minor">Minor</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm post">POST</span>
+            <span>/api/jobs</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">A documentação define que os valores válidos para <code>type</code> são <code>CLT</code>, <code>PJ</code>, <code>Estágio</code>, <code>Freelancer</code>, mas a API aceita qualquer string.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>POST /api/jobs</code> com body incluindo <code>"type": "XPTO"</code></li>
+            <li>A vaga é criada com type "XPTO" sem nenhum erro de validação</li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">Status: 400 Bad Request
+Erro indicando valores válidos: CLT, PJ, Estágio, Freelancer</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">Status: 200 OK
+Vaga criada com type: "XPTO"</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 7</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUG #8 ═══ -->
+    <div class="bug-card" id="bug-8">
+      <div class="bug-header">
+        <span class="bug-number">#8</span>
+        <span class="bug-title">POST aceita qualquer valor para "level"</span>
+        <span class="severity minor">Minor</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm post">POST</span>
+            <span>/api/jobs</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">A documentação define que os valores válidos para <code>level</code> são <code>estagio</code>, <code>junior</code>, <code>pleno</code>, <code>senior</code>, mas a API aceita qualquer string.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>POST /api/jobs</code> com body incluindo <code>"level": "mestre-jedi"</code></li>
+            <li>A vaga é criada com level "mestre-jedi" sem nenhum erro</li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">Status: 400 Bad Request
+Erro indicando valores válidos: estagio, junior, pleno, senior</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">Status: 200 OK
+Vaga criada com level: "mestre-jedi"</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 7</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUG #9 ═══ -->
+    <div class="bug-card" id="bug-9">
+      <div class="bug-header">
+        <span class="bug-number">#9</span>
+        <span class="bug-title">Description é truncada silenciosamente para 100 caracteres</span>
+        <span class="severity major">Major</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm post">POST</span>
+            <span>/api/jobs</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">Se o campo <code>description</code> tiver mais de 100 caracteres, é cortado silenciosamente sem aviso. O dado é persistido incompleto e o usuário nunca fica sabendo.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>POST /api/jobs</code> com uma description de 200+ caracteres</li>
+            <li>A vaga é criada com sucesso</li>
+            <li>Fazer <code>GET /api/jobs/:id</code> na vaga criada</li>
+            <li>O campo description está cortado em 100 caracteres</li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">Description salva por completo, sem limite, ou retorna erro 400 se houver limite</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">Description silenciosamente truncada para 100 caracteres sem nenhum aviso</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 8</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUG #10 ═══ -->
+    <div class="bug-card" id="bug-10">
+      <div class="bug-header">
+        <span class="bug-number">#10</span>
+        <span class="bug-title">POST retorna status 200 ao invés de 201</span>
+        <span class="severity minor">Minor</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm post">POST</span>
+            <span>/api/jobs</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">A documentação especifica que a criação de uma vaga deve retornar status <code>201 Created</code>, mas a API retorna <code>200 OK</code>.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>POST /api/jobs</code> com todos os campos válidos</li>
+            <li>Verificar o status code da resposta no Postman</li>
+            <li>O status é 200, não 201</li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">Status: 201 Created</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">Status: 200 OK</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 9</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUG #11 ═══ -->
+    <div class="bug-card" id="bug-11">
+      <div class="bug-header">
+        <span class="bug-number">#11</span>
+        <span class="bug-title">PUT não atualiza o campo updated_at</span>
+        <span class="severity major">Major</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm put">PUT</span>
+            <span>/api/jobs/:id</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">Ao atualizar uma vaga via PUT, o campo <code>updated_at</code> permanece com o valor original da criação. A documentação diz que deve ser atualizado automaticamente.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>GET /api/jobs/1</code> e anotar o valor de <code>updated_at</code></li>
+            <li>Esperar alguns segundos</li>
+            <li>Fazer <code>PUT /api/jobs/1</code> com todos os campos preenchidos</li>
+            <li>Comparar o <code>updated_at</code> — não mudou</li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">updated_at atualizado para data/hora do PUT
+Ex: "2026-02-06 23:05:30"</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">updated_at mantém valor original
+Ex: "2026-02-06 22:00:00" (igual ao created_at)</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 10</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUG #12 ═══ -->
+    <div class="bug-card" id="bug-12">
+      <div class="bug-header">
+        <span class="bug-number">#12</span>
+        <span class="bug-title">PATCH não atualiza o campo updated_at</span>
+        <span class="severity major">Major</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm patch">PATCH</span>
+            <span>/api/jobs/:id</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">Mesmo problema do PUT (Bug #11). Ao fazer PATCH, o campo <code>updated_at</code> não é atualizado para a data/hora atual.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>GET /api/jobs/3</code> e anotar o <code>updated_at</code></li>
+            <li>Esperar alguns segundos</li>
+            <li>Fazer <code>PATCH /api/jobs/3</code> com body: <code>{"status": "inactive"}</code></li>
+            <li>Comparar o <code>updated_at</code> — não mudou</li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">updated_at atualizado para data/hora do PATCH</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">updated_at mantém valor original, sem alteração</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 10</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUG #13 ═══ -->
+    <div class="bug-card" id="bug-13">
+      <div class="bug-header">
+        <span class="bug-number">#13</span>
+        <span class="bug-title">DELETE retorna campo com typo "statsu" ao invés de "status"</span>
+        <span class="severity cosmetic">Cosmetic</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm delete">DELETE</span>
+            <span>/api/jobs/:id</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">No objeto retornado após o DELETE, o campo <code>status</code> está escrito errado como <code>statsu</code> (typo).</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>DELETE /api/jobs/1</code></li>
+            <li>Observar os campos do objeto no campo <code>data</code> da resposta</li>
+            <li>O campo se chama <code>"statsu"</code> ao invés de <code>"status"</code></li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">{ ..., "status": "active", ... }</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">{ ..., "statsu": "active", ... }
+                    ^^^^^^ typo!</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 11</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BUG #14 ═══ -->
+    <div class="bug-card" id="bug-14">
+      <div class="bug-header">
+        <span class="bug-number">#14</span>
+        <span class="bug-title">Estatísticas com total errado</span>
+        <span class="severity major">Major</span>
+      </div>
+      <div class="bug-body">
+        <div class="field">
+          <div class="field-label">Endpoint</div>
+          <div class="endpoint-pill">
+            <span class="method-sm get">GET</span>
+            <span>/api/jobs/stats/summary</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Problema</div>
+          <div class="field-value">O campo <code>total</code> no sumário está errado. Ele soma <code>active + active</code> (duplica o valor de ativos) ao invés de somar <code>active + inactive</code>.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Passos para Reproduzir</div>
+          <ol class="steps">
+            <li>Fazer <code>GET /api/jobs/stats/summary</code></li>
+            <li>Observar os valores: <code>active = 18</code>, <code>inactive = 2</code></li>
+            <li>O campo <code>total</code> mostra 36 (18+18) ao invés de 20 (18+2)</li>
+          </ol>
+        </div>
+        <div class="field">
+          <div class="field-label">Resultado Esperado vs Obtido</div>
+          <div class="comparison">
+            <div class="box expected">
+              <div class="box-label">✅ Esperado</div>
+              <div class="box-content">"total": 20   (18 active + 2 inactive)
+"active": 18
+"inactive": 2</div>
+            </div>
+            <div class="box actual">
+              <div class="box-label">❌ Obtido</div>
+              <div class="box-content">"total": 36   (18 active + 18 active ⚠️)
+"active": 18
+"inactive": 2</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="dica-checklist">📌 Dica no checklist: item 12</div>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- SUMMARY TABLE -->
+    <h2 id="summary">📊 Resumo de Bugs por Área</h2>
+
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Área</th>
+          <th>Qtd</th>
+          <th>Bugs</th>
+          <th>Severidade</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ordenação / Filtros</td>
+          <td><span class="count">3</span></td>
+          <td>#1, #2, #3</td>
+          <td>Major, Major, Major</td>
+        </tr>
+        <tr>
+          <td>GET por ID</td>
+          <td><span class="count">1</span></td>
+          <td>#4</td>
+          <td>Major</td>
+        </tr>
+        <tr>
+          <td>POST (Criação)</td>
+          <td><span class="count">6</span></td>
+          <td>#5, #6, #7, #8, #9, #10</td>
+          <td>Major, Minor, Minor, Minor, Major, Minor</td>
+        </tr>
+        <tr>
+          <td>PUT / PATCH</td>
+          <td><span class="count">2</span></td>
+          <td>#11, #12</td>
+          <td>Major, Major</td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td><span class="count">1</span></td>
+          <td>#13</td>
+          <td>Cosmetic</td>
+        </tr>
+        <tr>
+          <td>Estatísticas</td>
+          <td><span class="count">1</span></td>
+          <td>#14</td>
+          <td>Major</td>
+        </tr>
+        <tr style="font-weight:700; border-top: 2px solid #475569;">
+          <td>TOTAL</td>
+          <td><span class="count" style="background:#7f1d1d;font-size:14px;">14</span></td>
+          <td colspan="2"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:32px; padding:20px; background:#1e293b; border:1px solid #334155; border-radius:10px; text-align:center;">
+      <p style="font-size:13px; color:#64748b; margin:0;">
+        🔐 Este gabarito é confidencial — apenas para o avaliador.<br>
+        Cada bug corresponde a uma dica do checklist na documentação (docs.html).
+      </p>
+    </div>
+
+  </div>
+
+</body>
+</html>
