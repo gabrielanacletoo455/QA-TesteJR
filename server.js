@@ -40,8 +40,4 @@ app.use((req, res) => {
   res.status(404).json({ error: "Rota não encontrada" });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-  console.log(`📋 Documentação: http://localhost:${PORT}/docs.html`);
-  console.log(`🧪 Tester UI: http://localhost:${PORT}/tester`);
-});
+module.exports = app;
